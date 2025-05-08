@@ -1,0 +1,310 @@
+{
+  "_note1": "KEEP THIS FILE! Check it into a version control system (VCS) like git.",
+  "_note2": "ObjectBox manages crucial IDs for your object model. See docs for details.",
+  "_note3": "If you have VCS merge conflicts, you must resolve them according to ObjectBox docs.",
+  "entities": [
+    {
+      "id": "1:2492132413375194045",
+      "lastPropertyId": "5:1481039183044372288",
+      "name": "User",
+      "properties": [
+        {
+          "id": "1:4451648304969386789",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:3231024758808749722",
+          "name": "mail",
+          "type": 9
+        },
+        {
+          "id": "3:6899071104821995895",
+          "name": "name",
+          "type": 9
+        },
+        {
+          "id": "4:6663349691697981530",
+          "name": "personalnummer",
+          "type": 6
+        },
+        {
+          "id": "5:1481039183044372288",
+          "name": "adminRecht",
+          "type": 6
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "2:4725321174313482246",
+      "lastPropertyId": "36:4057863464081282204",
+      "name": "Fahrzeug",
+      "properties": [
+        {
+          "id": "1:6181775847117745108",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "5:691807637352760470",
+          "name": "name",
+          "type": 9
+        },
+        {
+          "id": "7:6532118491828356440",
+          "name": "imagePath",
+          "type": 9
+        },
+        {
+          "id": "8:2054600200631530198",
+          "name": "objektName",
+          "type": 9
+        },
+        {
+          "id": "9:4814464539751751022",
+          "name": "caption",
+          "type": 9
+        },
+        {
+          "id": "10:1041426771502522887",
+          "name": "gpsTimeString",
+          "type": 9
+        },
+        {
+          "id": "11:5268494759527940773",
+          "name": "versicherungsnummer",
+          "type": 9
+        },
+        {
+          "id": "12:3612276928216135745",
+          "name": "telefonUnfall",
+          "type": 9
+        },
+        {
+          "id": "13:7952618062842541291",
+          "name": "telefonPanne",
+          "type": 9
+        },
+        {
+          "id": "14:850376759007650240",
+          "name": "versicherung",
+          "type": 9
+        },
+        {
+          "id": "15:4751667216992063845",
+          "name": "gpsTime",
+          "type": 6
+        },
+        {
+          "id": "16:3764223658986668640",
+          "name": "course",
+          "type": 6
+        },
+        {
+          "id": "17:3152079915596971326",
+          "name": "satInView",
+          "type": 6
+        },
+        {
+          "id": "18:2591959495218126666",
+          "name": "overspeed",
+          "type": 6
+        },
+        {
+          "id": "19:4269067653250651552",
+          "name": "fahrzeugId",
+          "type": 6
+        },
+        {
+          "id": "20:5169602788426664912",
+          "name": "faultCodes",
+          "type": 6
+        },
+        {
+          "id": "21:4398058805191570779",
+          "name": "latitude",
+          "type": 8
+        },
+        {
+          "id": "22:3217827920109856868",
+          "name": "longitude",
+          "type": 8
+        },
+        {
+          "id": "23:7912068835933179019",
+          "name": "speed",
+          "type": 8
+        },
+        {
+          "id": "24:3383653787697762654",
+          "name": "speedKnots",
+          "type": 8
+        },
+        {
+          "id": "25:4150918775628667114",
+          "name": "rpm",
+          "type": 8
+        },
+        {
+          "id": "26:9097709455073379015",
+          "name": "fuelLevel",
+          "type": 8
+        },
+        {
+          "id": "27:1286004137233887589",
+          "name": "fuelRate",
+          "type": 8
+        },
+        {
+          "id": "28:4564575478517618264",
+          "name": "externalPower",
+          "type": 8
+        },
+        {
+          "id": "29:5744871447191606469",
+          "name": "mileage",
+          "type": 8
+        },
+        {
+          "id": "30:1312058018774545669",
+          "name": "altitude",
+          "type": 8
+        },
+        {
+          "id": "31:1285359685239699948",
+          "name": "coolantTemperature",
+          "type": 8
+        },
+        {
+          "id": "32:5666397708294996459",
+          "name": "gasPedal",
+          "type": 8
+        },
+        {
+          "id": "33:835198376836444007",
+          "name": "motorLast",
+          "type": 8
+        },
+        {
+          "id": "34:6401013270006278715",
+          "name": "xAcceleration",
+          "type": 8
+        },
+        {
+          "id": "35:5286088191898578339",
+          "name": "zAcceleration",
+          "type": 8
+        },
+        {
+          "id": "36:4057863464081282204",
+          "name": "ignition",
+          "type": 1
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "3:434567157745431245",
+      "lastPropertyId": "3:7097490499595312094",
+      "name": "GeoData",
+      "properties": [
+        {
+          "id": "1:2628069601617340041",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:8681447968760908698",
+          "name": "lat",
+          "type": 8
+        },
+        {
+          "id": "3:7097490499595312094",
+          "name": "lon",
+          "type": 8
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "4:4348756249716174310",
+      "lastPropertyId": "5:697934595393799308",
+      "name": "Api",
+      "properties": [
+        {
+          "id": "1:7885808146490456880",
+          "name": "id",
+          "type": 6,
+          "flags": 129
+        },
+        {
+          "id": "2:6484640682554959204",
+          "name": "url",
+          "type": 9
+        },
+        {
+          "id": "3:7639477196981434986",
+          "name": "shortUrl",
+          "type": 9
+        },
+        {
+          "id": "4:65255319751116559",
+          "name": "localhostURL",
+          "type": 9
+        },
+        {
+          "id": "5:697934595393799308",
+          "name": "apiUrl",
+          "type": 9
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "5:2556811995860029375",
+      "lastPropertyId": "3:4458439923652885007",
+      "name": "LoginUserData",
+      "properties": [
+        {
+          "id": "1:3039073897632894564",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:8004158669458679451",
+          "name": "username",
+          "type": 9
+        },
+        {
+          "id": "3:4458439923652885007",
+          "name": "password",
+          "type": 9
+        }
+      ],
+      "relations": []
+    }
+  ],
+  "lastEntityId": "5:2556811995860029375",
+  "lastIndexId": "1:7225187244195517059",
+  "lastRelationId": "0:0",
+  "lastSequenceId": "0:0",
+  "modelVersion": 5,
+  "modelVersionParserMinimum": 5,
+  "retiredEntityUids": [],
+  "retiredIndexUids": [
+    7225187244195517059
+  ],
+  "retiredPropertyUids": [
+    95372804159786534,
+    723810006647610969,
+    3923588671342832562,
+    2079692014902960994
+  ],
+  "retiredRelationUids": [],
+  "version": 1
+}
