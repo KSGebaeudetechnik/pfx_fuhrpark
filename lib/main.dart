@@ -153,6 +153,7 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
             displayLarge: TextStyle(
               fontFamily: "Roboto",
               fontSize: 16.0,
+
               color: Color(0xFF2F4162), //Nav Bar Text
             ),
             displayMedium: TextStyle(
