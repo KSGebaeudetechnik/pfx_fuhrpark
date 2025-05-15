@@ -5,7 +5,7 @@ import 'package:riverpod/riverpod.dart';
 import '../features/authentication/data/auth_repository.dart';
 import '../features/authentication/presentation/login_screen.dart';
 import '../features/authentication/presentation/register_screen.dart';
-import '../features/home/objects/Fahrzeug.dart';
+import '../features/home/objects/fahrzeug.dart';
 import '../features/home/presentation/editFahrzeug_screen.dart';
 import '../features/home/presentation/home_screen.dart';
 import '../features/home/presentation/scaffold_with_navbar.dart';
@@ -19,7 +19,7 @@ enum AppRoute {
   home,
   map,
   profile,
-  editTracker,
+  editFahrzeug,
   activity,
   // redirect,
 }
@@ -99,7 +99,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                 builder: (context, state) => const HomeScreen(),
                 routes: <RouteBase>[
                   GoRoute(
-                    path: 'editTracker',
+                    path: 'editFahrzeug',
                     parentNavigatorKey: _sectionNavigatorKey1,
                     builder: (context, state) {
                       Fahrzeug fahrzeug = state.extra as Fahrzeug;

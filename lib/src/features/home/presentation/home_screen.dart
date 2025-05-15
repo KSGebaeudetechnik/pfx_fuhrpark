@@ -7,13 +7,16 @@ import 'package:go_router/go_router.dart';
 import '../../authentication/data/auth_repository.dart';
 import '../data/fahrzeug_provider.dart';
 
-class HomeScreen extends ConsumerWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
-
-
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  @override
+  Widget build(BuildContext context) {
     final userAsync = ref.watch(userProvider);
 
     return Scaffold(
@@ -45,7 +48,8 @@ class HomeScreen extends ConsumerWidget {
                             padding: const EdgeInsets.only(top: 35.0),
                             child: GestureDetector(
                               onTap: () {
-                                context.push('/fahrzeug/details', extra: fzg);
+                                context.push('/home/editFahrzeug',
+                                    extra: fzg).then((value) => setState((){}));
                               },
                               child: fzg.imagePath != null
                                   ? Container(
@@ -184,7 +188,7 @@ class HomeScreen extends ConsumerWidget {
                                                   height: 37.0,
                                                   child: OutlinedButton(
                                                     onPressed: () {
-                                                      context.push('/fahrzeug/details',
+                                                      context.push('/home/editFahrzeug',
                                                           extra: fzg);
                                                     },
                                                     child: Text("Details",
