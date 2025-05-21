@@ -7,6 +7,7 @@ import 'package:pfx_fuhrpark/src/utils/custom_color_swatch.dart';
 import 'package:pfx_fuhrpark/src/utils/dismiss_keyboard.dart';
 import 'package:pfx_fuhrpark/src/utils/objectbox.dart';
 import 'package:stack_trace/stack_trace.dart' as stack_trace;
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 late ObjectBox objectBox;
 late SyncService syncService;
@@ -45,6 +46,14 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
       child: MaterialApp.router(
         debugShowCheckedModeBanner: false,
         routerConfig: goRouter,
+        localizationsDelegates: [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [
+          Locale('de'),
+        ],
         title: 'Flutter Starter Project',
         theme: ThemeData(
           ///Farbschema Möglichkeit 1

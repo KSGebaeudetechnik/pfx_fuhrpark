@@ -15,6 +15,7 @@ class _ProfilScreenState extends ConsumerState<ProfilScreen> {
 
   Future<void> _pickDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
+      locale: Locale('de'),
       context: context,
       initialDate: selectedDate,
       firstDate: DateTime.now().subtract(const Duration(days: 365)),
@@ -32,7 +33,9 @@ class _ProfilScreenState extends ConsumerState<ProfilScreen> {
     final userAsync = ref.watch(userProvider);
 
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
       appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.primary,
         title: GestureDetector(
           onTap: () => _pickDate(context),
           child: Row(
@@ -67,18 +70,48 @@ class _ProfilScreenState extends ConsumerState<ProfilScreen> {
                 itemCount: fahrten.length,
                 itemBuilder: (context, index) {
                   final fahrt = fahrten[index];
-                  return ListTile(
-                    leading: const Icon(Icons.directions_car),
-                    title: Text("${fahrt.startOrt ?? "Start"} → ${fahrt.zielOrt ?? "Ziel"}", style: TextStyle(color: Colors.black)),
-                    subtitle: Text(
-                      "${fahrt.startzeit.hour}:${fahrt.startzeit.minute.toString().padLeft(2, '0')} – "
-                          "${fahrt.stopzeit.hour}:${fahrt.stopzeit.minute.toString().padLeft(2, '0')}",
-                     style: TextStyle(color: Colors.black)),
-                    trailing: Text(
-                      fahrt.strecke >= 1000
-                          ? "${(fahrt.strecke / 1000).toStringAsFixed(1)} km"
-                          : "${fahrt.strecke.toStringAsFixed(0)} m",
-                     style: TextStyle(color: Colors.black)),
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Card(
+                      child: ListTile(
+                        leading: const Icon(Icons.directions_car),
+                          title: Container(
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).colorScheme.secondary,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            padding: const EdgeInsets.all(8),
+                            child: Text(
+                              "${(fahrt.startOrt ?? "Start").replaceAll(', Germany', '')} \n → ${(fahrt.zielOrt ?? "Ziel").replaceAll(', Germany', '')}",
+                              style: const TextStyle(color: Colors.black, fontSize: 13.0),
+                            ),
+                          ),
+                        subtitle: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: Row(
+                            children: [
+                              Text(
+                                "${fahrt.startzeit.hour}:${fahrt.startzeit.minute.toString().padLeft(2, '0')} – "
+                                    "${fahrt.stopzeit.hour}:${fahrt.stopzeit.minute.toString().padLeft(2, '0')}",
+                                style: const TextStyle(color: Colors.black),
+                              ),
+                              const SizedBox(width: 50),
+                              Text(
+                                "${fahrt.stopzeit.difference(fahrt.startzeit).inHours}:"
+                                    "${fahrt.stopzeit.difference(fahrt.startzeit).inMinutes.remainder(60).toString().padLeft(2, '0')}",
+                                style: const TextStyle(color: Colors.black),
+                              ),
+                            ],
+                          ),
+                        ),
+                        trailing: Text(
+                          fahrt.strecke >= 1000
+                              ? "${(fahrt.strecke / 1000).toStringAsFixed(1)} km"
+                              : "${fahrt.strecke.toStringAsFixed(0)} m",
+                         style: TextStyle(color: Colors.black)),
+
+                      ),
+                    ),
                   );
                 },
               );

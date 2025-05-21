@@ -18,8 +18,8 @@ class Fahrt {
       startzeit: DateTime.parse(json['Startzeit']),
       stopzeit: DateTime.parse(json['StopZeit']),
       strecke: double.tryParse(json['Strecke'].toString()) ?? 0.0,
-      startOrt: json['StartOrt'],
-      zielOrt: json['ZielOrt'],
+      startOrt: json['StartAdresse'],
+      zielOrt: json['StopAdresse'],
     );
   }
 }

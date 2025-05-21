@@ -83,7 +83,7 @@ class _EditFahrzeugScreenState extends State<EditFahrzeugScreen> {
               elevation: 0.0,
               child: SizedBox(
                 width: 314,
-                height: 325,
+                height: 225,
                 child: Column(
                   children: [
                     Row(
@@ -112,6 +112,7 @@ class _EditFahrzeugScreenState extends State<EditFahrzeugScreen> {
                                     : Container(
                                         height: 150.0,
                                         width: 150.0,
+                                        
                                         decoration: const BoxDecoration(
                                           shape: BoxShape.circle,
                                           image: DecorationImage(
@@ -119,6 +120,7 @@ class _EditFahrzeugScreenState extends State<EditFahrzeugScreen> {
                                                   'images/placeholder-img.jpg'),
                                               fit: BoxFit.cover),
                                         ),
+                                  child: Icon(Icons.directions_car, size: 100.0,),
                                       )),
                           ],
                         ),
@@ -143,7 +145,7 @@ class _EditFahrzeugScreenState extends State<EditFahrzeugScreen> {
               elevation: 0.0,
               child: SizedBox(
                 width: 314,
-                height: 220,
+                height: 250,
                 child: Column(
                   children: [
                     const SizedBox(height: 10.0),
@@ -166,7 +168,29 @@ class _EditFahrzeugScreenState extends State<EditFahrzeugScreen> {
                       ],
                     ),
                     const SizedBox(
-                      height: 20.0,
+                      height: 25.0,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Fahrzeugtyp",
+                            style: TextStyle(color: Colors.black),
+                          ),
+                          Text(
+                            "${widget.diesesFahrzeug.typ}",
+                            style: TextStyle(color: Colors.black),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                      child:
+                      Divider(color: Theme.of(context).colorScheme.outline),
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 30.0),
@@ -183,15 +207,20 @@ class _EditFahrzeugScreenState extends State<EditFahrzeugScreen> {
                                   "--",
                                   style: TextStyle(color: Colors.black),
                                 )
+                              : widget.diesesFahrzeug.fuelLevel! < 15
+                          ? Text(
+                                  "${widget.diesesFahrzeug.fuelLevel!.toInt()} %",
+                                  style: TextStyle(color: Colors.red),
+                                )
+                              : widget.diesesFahrzeug.fuelLevel! < 30
+                          ? Text(
+                              "${widget.diesesFahrzeug.fuelLevel!.toInt()} %",
+                              style: TextStyle(color: Colors.amber))
                               : Text(
-                                  "${widget.diesesFahrzeug.fuelLevel} %",
-                                  style: TextStyle(color: Colors.black),
-                                ),
+                              "${widget.diesesFahrzeug.fuelLevel!.toInt()} %",
+                              style: TextStyle(color: Colors.black))
                         ],
                       ),
-                    ),
-                    const SizedBox(
-                      height: 5.0,
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -214,9 +243,6 @@ class _EditFahrzeugScreenState extends State<EditFahrzeugScreen> {
                           ),
                         ],
                       ),
-                    ),
-                    const SizedBox(
-                      height: 5.0,
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -302,7 +328,7 @@ class _EditFahrzeugScreenState extends State<EditFahrzeugScreen> {
                       ],
                     ),
                     const SizedBox(
-                      height: 20.0,
+                      height: 25.0,
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 30.0),
@@ -350,9 +376,6 @@ class _EditFahrzeugScreenState extends State<EditFahrzeugScreen> {
                           ),
                         ],
                       ),
-                    ),
-                    const SizedBox(
-                      height: 5.0,
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -402,6 +425,9 @@ class _EditFahrzeugScreenState extends State<EditFahrzeugScreen> {
                 ),
               ),
             ),
+            const SizedBox(
+              height: 30.0,
+            )
           ],
         ),
       ),

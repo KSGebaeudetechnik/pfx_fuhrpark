@@ -17,6 +17,8 @@ class Fahrzeug {
   final String? telefonUnfall;
   final String? telefonPanne;
   final String? versicherung;
+  final String? typ;
+  final String? typNummer;
 
   final int? gpsTime;
   final int? course;
@@ -24,6 +26,7 @@ class Fahrzeug {
   final int? overspeed;
   final int? fahrzeugId;
   final int? faultCodes;
+
 
   final double? latitude;
   final double? longitude;
@@ -57,6 +60,8 @@ class Fahrzeug {
     this.telefonUnfall,
     this.telefonPanne,
     this.versicherung,
+    this.typ,
+    this.typNummer,
     this.gpsTime,
     this.latitude,
     this.longitude,
@@ -100,7 +105,9 @@ class Fahrzeug {
       telefonUnfall: parse<String>(json['TelefonUnfall']),
       telefonPanne: parse<String>(json['TelefonPanne']),
       versicherung: parse<String>(json['Versicherung']),
+      typ: parse<String>(json['TYP']),
 
+      typNummer: parse<String>(json['TYP_NUMMER']),
       gpsTime: parse<int>(json['GPSTIME']),
       latitude: parse<double>(json['LATITUDE']),
       longitude: parse<double>(json['LONGITUDE']),

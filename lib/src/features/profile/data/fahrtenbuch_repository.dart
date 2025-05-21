@@ -8,6 +8,7 @@ class FahrtenbuchRepository {
 
   Future<List<Fahrt>> fetchFahrtenbuch(String userId, DateTime date) async {
     final url = Uri.parse("$baseUrl?access=$access&user=$userId&date=${date.toIso8601String().split('T').first}");
+    // print(url);
     final response = await http.get(url);
 
     if (response.statusCode == 200 && response.body.isNotEmpty) {
