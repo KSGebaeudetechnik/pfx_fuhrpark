@@ -15,7 +15,9 @@ import '../../home/objects/fahrzeug.dart';
 import 'package:flutter_map_tile_caching/flutter_map_tile_caching.dart';
 
 class KarteScreen extends ConsumerStatefulWidget {
-  const KarteScreen({super.key});
+  final Fahrzeug? initialFahrzeug;
+
+  const KarteScreen({super.key, this.initialFahrzeug});
 
   @override
   ConsumerState<KarteScreen> createState() => _KarteScreenState();
@@ -27,22 +29,40 @@ class _KarteScreenState extends ConsumerState<KarteScreen> {
   Timer? _timer;
   final _popupController = PopupController();
   Marker? lastOpenedMarker; // lokal merken
+  final _mapController = MapController(); //um auf einzelnes Fahrzeug zu zoomen wenn man von einer Card auf dem HomeScreen kommt
+  late LatLng initialCenter;
+  double initialZoom = 13.0;
 
   @override
   void initState() {
     super.initState();
-    // addPostFrameCallback genutzt, damit _loadPosition()
-    // erst nach dem ersten Build-Frame ausgeführt wird.
-    // Dadurch wird der der Location-Permission-Dialog
-    // korrekt angezeigt (ohne das musste man etwas anklicken damit der Dialog kommt).
+
+    if (widget.initialFahrzeug != null &&
+        widget.initialFahrzeug!.latitude != null &&
+        widget.initialFahrzeug!.longitude != null) {
+      initialCenter = LatLng(
+        widget.initialFahrzeug!.latitude!,
+        widget.initialFahrzeug!.longitude!,
+      );
+      initialZoom = 16.0;
+    } else {
+      // Fallback: wird später durch _loadPosition ersetzt
+      initialCenter = LatLng(0, 0);
+    }
+
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      _loadPosition();
-
-      await _syncFahrzeuge(); // initialer fetch
+      _loadPosition(); // setzt ggf. _currentPosition
+      await _syncFahrzeuge(); // Marker laden
       _startTimer();
-
-      WidgetsFlutterBinding.ensureInitialized();
       await FMTCObjectBoxBackend().initialise();
+
+      // Wenn kein initialFahrzeug gesetzt war, jetzt auf User zoomen:
+      if (widget.initialFahrzeug == null && _currentPosition != null) {
+        _mapController.move(
+          LatLng(_currentPosition!.latitude, _currentPosition!.longitude),
+          13.0,
+        );
+      }
     });
   }
 
@@ -110,188 +130,157 @@ class _KarteScreenState extends ConsumerState<KarteScreen> {
               ),
             )
           : FlutterMap(
-              options: MapOptions(
-                initialCenter: LatLng(
-                    _currentPosition!.latitude, _currentPosition!.longitude),
-                initialZoom: 13,
+        mapController: _mapController,
+        options: MapOptions(
+          initialCenter: initialCenter, // vorher gesetzt in initState
+          initialZoom: initialZoom,
+        ),
+        children: [
+          // Kachel-Layer
+          TileLayer(
+            urlTemplate: 'https://{s}.tile.openstreetmap.de/{z}/{x}/{y}.png',
+            subdomains: ['a', 'b', 'c'],
+            userAgentPackageName: 'com.example.mapfinder',
+          ),
+
+          // Eigene Position
+          MarkerLayer(
+            markers: [
+              Marker(
+                point: LatLng(
+                  _currentPosition!.latitude,
+                  _currentPosition!.longitude,
+                ),
+                width: 50,
+                height: 50,
+                rotate: true,
+                child: const Icon(
+                  Icons.location_on,
+                  size: 40.0,
+                  color: Colors.blue,
+                ),
               ),
-              children: [
-                TileLayer(
-                  urlTemplate: 'https://{s}.tile.openstreetmap.de/{z}/{x}/{y}.png',
-                  subdomains: ['a', 'b', 'c'],
-                  userAgentPackageName: 'com.example.mapfinder',
-                ),
+            ],
+          ),
 
-                // Eigene Position
-                MarkerLayer(
-                  markers: [
-                    Marker(
-                      point: LatLng(_currentPosition!.latitude,
-                          _currentPosition!.longitude),
-                      width: 50,
-                      height: 50,
-                      rotate: true,
-                      child: const Icon(Icons.location_on,
-                          size: 40.0, color: Colors.blue),
-                    ),
-                  ],
-                ),
+          // Fahrzeug-Marker + Cluster + Popups
+          PopupScope(
+            popupController: _popupController,
+            child: MarkerClusterLayerWidget(
+              options: MarkerClusterLayerOptions(
+                maxClusterRadius: 45,
+                size: const Size(40, 40),
+                zoomToBoundsOnClick: false,
+                centerMarkerOnClick: false,
 
-                // Fahrzeuge
-                PopupScope(
+                popupOptions: PopupOptions(
                   popupController: _popupController,
-                  child: FlutterMap(
-                    options: MapOptions(
-                      initialCenter: LatLng(
-                        _currentPosition!.latitude,
-                        _currentPosition!.longitude,
-                      ),
-                      initialZoom: 13,
-                    ),
-                    children: [
-                      TileLayer(
-                        urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                        userAgentPackageName: 'com.example.pfx_fuhrpark',
-                      ),
+                  popupBuilder: (context, marker) {
+                    final fzg = fahrzeuge.firstWhere(
+                          (f) =>
+                      f.latitude == marker.point.latitude &&
+                          f.longitude == marker.point.longitude,
+                      orElse: () =>
+                          Fahrzeug(name: "Unbekannt", gpsTimeString: "-"),
+                    );
 
-                      // Eigene Position
-                      MarkerLayer(
-                        markers: [
-                          Marker(
-                            point: LatLng(
-                              _currentPosition!.latitude,
-                              _currentPosition!.longitude,
-                            ),
-                            width: 50,
-                            height: 50,
-                            rotate: true,
-                            child: const Icon(
-                              Icons.location_on,
-                              size: 40.0,
-                              color: Colors.blue,
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      // Fahrzeug-Marker + Cluster + Popups
-                      MarkerClusterLayerWidget(
-                        options: MarkerClusterLayerOptions(
-                          maxClusterRadius: 45,
-                          size: const Size(40, 40),
-                          zoomToBoundsOnClick: false,
-                          centerMarkerOnClick: false,
-
-                          popupOptions: PopupOptions(
-                            popupController: _popupController,
-                            popupBuilder: (context, marker) {
-                              final fzg = fahrzeuge.firstWhere(
-                                    (f) =>
-                                f.latitude == marker.point.latitude &&
-                                    f.longitude == marker.point.longitude,
-                                orElse: () =>
-                                    Fahrzeug(name: "Unbekannt", gpsTimeString: "-"),
-                              );
-
-                              return TweenAnimationBuilder<double>(
-                                tween: Tween(begin: 0.8, end: 1.0),
-                                duration: const Duration(milliseconds: 250),
-                                curve: Curves.easeOut,
-                                builder: (ctx, scale, child) => Transform.scale(
-                                  scale: scale,
-                                  child: Opacity(
-                                    opacity: scale.clamp(0.0, 1.0),
-                                    child: child,
-                                  ),
-                                ),
-                                child: GestureDetector(
-                                  onTap: () => _popupController.hideAllPopups(),
-                                  child: Card(
-                                    margin: const EdgeInsets.all(8),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(12),
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            fzg.name ?? "Fahrzeug",
-                                            style: Theme.of(context).textTheme.bodyLarge,
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            "Letzte Aktualisierung:",
-                                            style: Theme.of(context).textTheme.labelMedium,
-                                          ),
-                                          Text(
-                                            fzg.gpsTimeString ?? "-",
-                                            style: Theme.of(context).textTheme.labelMedium,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-
-                          builder: (context, markers) => Container(
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              color: Colors.blueAccent,
-                              shape: BoxShape.circle,
-                              border: Border.all(color: Colors.white, width: 2),
-                            ),
-                            child: Text(
-                              markers.length.toString(),
-                              style: const TextStyle(color: Colors.white),
-                            ),
-                          ),
-
-                          markers: fahrzeuge
-                              .where((f) => f.latitude != null && f.longitude != null)
-                              .map((f) {
-                            final markerPoint = LatLng(f.latitude!, f.longitude!);
-                            final markerKey = ValueKey(f.fahrzeugId);
-                            late Marker marker;
-
-                            marker = Marker(
-                              key: markerKey,
-                              rotate: true,
-                              point: markerPoint,
-                              width: 40,
-                              height: 40,
-                              child: GestureDetector(
-                                onTap: () {
-                                  if (lastOpenedMarker?.key == marker.key) {
-                                    _popupController.hideAllPopups();
-                                    lastOpenedMarker = null;
-                                  } else {
-                                    _popupController.showPopupsOnlyFor([marker]);
-                                    lastOpenedMarker = marker;
-                                  }
-                                },
-                                child: Icon(
-                                  Icons.directions_car_filled,
-                                  color: f.ignition == true ? Colors.green : Colors.red,
-                                  size: 30,
-                                ),
-                              ),
-                            );
-
-                            return marker;
-                          }).toList(),
+                    return TweenAnimationBuilder<double>(
+                      tween: Tween(begin: 0.8, end: 1.0),
+                      duration: const Duration(milliseconds: 250),
+                      curve: Curves.easeOut,
+                      builder: (ctx, scale, child) => Transform.scale(
+                        scale: scale,
+                        child: Opacity(
+                          opacity: scale.clamp(0.0, 1.0),
+                          child: child,
                         ),
                       ),
-                    ],
+                      child: GestureDetector(
+                        onTap: () => _popupController.hideAllPopups(),
+                        child: Card(
+                          margin: const EdgeInsets.all(8),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  fzg.name ?? "Fahrzeug",
+                                  style: Theme.of(context).textTheme.bodyLarge,
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  "Letzte Aktualisierung:",
+                                  style: Theme.of(context).textTheme.labelMedium,
+                                ),
+                                Text(
+                                  fzg.gpsTimeString ?? "-",
+                                  style: Theme.of(context).textTheme.labelMedium,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+
+                builder: (context, markers) => Container(
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: Colors.blueAccent,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 2),
+                  ),
+                  child: Text(
+                    markers.length.toString(),
+                    style: const TextStyle(color: Colors.white),
                   ),
                 ),
-              ],
+
+                markers: fahrzeuge
+                    .where((f) => f.latitude != null && f.longitude != null)
+                    .map((f) {
+                  final markerPoint = LatLng(f.latitude!, f.longitude!);
+                  final markerKey = ValueKey(f.fahrzeugId);
+                  late Marker marker;
+
+                  marker = Marker(
+                    key: markerKey,
+                    rotate: true,
+                    point: markerPoint,
+                    width: 40,
+                    height: 40,
+                    child: GestureDetector(
+                      onTap: () {
+                        if (lastOpenedMarker?.key == marker.key) {
+                          _popupController.hideAllPopups();
+                          lastOpenedMarker = null;
+                        } else {
+                          _popupController.showPopupsOnlyFor([marker]);
+                          lastOpenedMarker = marker;
+                        }
+                      },
+                      child: Icon(
+                        Icons.directions_car_filled,
+                        color: f.ignition == true ? Colors.green : Colors.red,
+                        size: 30,
+                      ),
+                    ),
+                  );
+
+                  return marker;
+                }).toList(),
+              ),
             ),
+          ),
+        ],
+      )
     );
   }
 }

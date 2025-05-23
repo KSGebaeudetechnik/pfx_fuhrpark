@@ -86,6 +86,7 @@ class _EditFahrzeugScreenState extends State<EditFahrzeugScreen> {
                 height: 225,
                 child: Column(
                   children: [
+                    SizedBox(height: 40.0,),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -109,19 +110,44 @@ class _EditFahrzeugScreenState extends State<EditFahrzeugScreen> {
                                               fit: BoxFit.cover),
                                         ),
                                       )
-                                    : Container(
-                                        height: 150.0,
-                                        width: 150.0,
-                                        
-                                        decoration: const BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          image: DecorationImage(
-                                              image: AssetImage(
-                                                  'images/placeholder-img.jpg'),
-                                              fit: BoxFit.cover),
-                                        ),
-                                  child: Icon(Icons.directions_car, size: 100.0,),
-                                      )),
+                                    : widget.diesesFahrzeug.typNummer == "2" ||
+                                    widget.diesesFahrzeug.typNummer == "1" ||
+                                    widget.diesesFahrzeug.typNummer == "4" ||
+                                    widget.diesesFahrzeug.typNummer == null
+                                    ? ClipRRect(
+                                  borderRadius:
+                                  const BorderRadius.vertical(
+                                      top: Radius.circular(100.0)),
+                                  child: Image.asset(
+                                    'assets/images/pkw.png',
+                                    width: 130,
+                                    height: 90,
+                                    fit: BoxFit.cover,
+                                  ),
+                                )
+                                    : widget.diesesFahrzeug.typNummer == "3"
+                                    ? ClipRRect(
+                                  borderRadius:
+                                  const BorderRadius.vertical(
+                                      top: Radius.circular(100.0)),
+                                  child: Image.asset(
+                                    'assets/images/lkw.png',
+                                    width: 130,
+                                    height: 90,
+                                    fit: BoxFit.cover,
+                                  ),
+                                )
+                                    : ClipRRect(
+                                  borderRadius:
+                                  const BorderRadius.vertical(
+                                      top: Radius.circular(100.0)),
+                                  child: Image.asset(
+                                    'assets/images/anhaenger.png',
+                                    width: 130,
+                                    height: 90,
+                                    fit: BoxFit.cover,
+                                  ),
+                                )),
                           ],
                         ),
                       ],

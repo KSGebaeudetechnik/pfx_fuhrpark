@@ -125,7 +125,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             routes: <RouteBase>[
               GoRoute(
                 path: '/map',
-                builder: (context, state) => const KarteScreen(),
+                builder: (context, state) {
+                  final fzg = state.extra as Fahrzeug?;
+                  return KarteScreen(initialFahrzeug: fzg);
+                },
               ),
             ],
           ),

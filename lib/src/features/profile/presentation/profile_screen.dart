@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../authentication/data/auth_repository.dart';
 import '../data/fahrtenbuch_provider.dart';
 
@@ -36,6 +37,32 @@ class _ProfilScreenState extends ConsumerState<ProfilScreen> {
       backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.primary,
+        actions: [Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 15.0),
+          child: FilledButton(
+            onPressed: () async {
+              // Abmelden
+              final authRepo = ref.read(authProvider.notifier);  // falls du im Widget Zugriff auf ref hast
+
+              await authRepo.logout();
+
+              // Danach zur Login-Seite navigieren
+              context.push('/login'); // oder dein gewünschter Pfad
+            },
+            style: ButtonStyle(
+              padding:
+              WidgetStateProperty
+                  .all(const EdgeInsets
+                  .symmetric(
+                  horizontal:
+                  14.0)),
+            backgroundColor: WidgetStateProperty.all<Color>(Colors.blueAccent)),
+            child: Text("   Abmelden   ",
+                style: Theme.of(context)
+                    .textTheme
+                    .labelSmall),
+          ),
+        ),],
         title: GestureDetector(
           onTap: () => _pickDate(context),
           child: Row(
@@ -74,7 +101,7 @@ class _ProfilScreenState extends ConsumerState<ProfilScreen> {
                     padding: const EdgeInsets.all(8.0),
                     child: Card(
                       child: ListTile(
-                        leading: const Icon(Icons.directions_car),
+                        // leading: Expanded(child: RotatedBox(child: Text("Kennzeichen"), quarterTurns: 3,)),
                           title: Container(
                             decoration: BoxDecoration(
                               color: Theme.of(context).colorScheme.secondary,

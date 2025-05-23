@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:math';
 
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -15,6 +16,11 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
+  bool _vibration = false;
+  bool _ledLicht = false;
+  MenuItem selectedItem = items[0];
+  MenuItem selectedFarbItem = lichtfarben[0];
+
   @override
   Widget build(BuildContext context) {
     final userAsync = ref.watch(userProvider);
@@ -22,6 +28,62 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
       resizeToAvoidBottomInset: false,
+      floatingActionButton: DropdownButtonHideUnderline(
+        child: DropdownButton2(
+          isExpanded: true,
+
+          hint: Text(
+            'Select Item',
+            style: TextStyle(
+              fontSize: 14,
+              color: Theme.of(context).hintColor,
+            ),
+          ),
+          items: [
+            ...items.map(
+              (item) => DropdownMenuItem<MenuItem>(
+                value: item,
+                child: MenuItem.buildItemDescription(item, context),
+              ),
+            ),
+          ],
+          onChanged: (changed) {
+            setState(() {
+              selectedItem = changed!;
+            });
+          },
+          value: selectedItem,
+          buttonStyleData: ButtonStyleData(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              height: 50,
+              width: 180,
+              decoration: BoxDecoration(
+                  color: Colors.indigo,
+                  borderRadius: const BorderRadius.all(Radius.circular(30.0)))),
+          dropdownStyleData: const DropdownStyleData(
+            maxHeight: 500,
+          ),
+          menuItemStyleData: MenuItemStyleData(
+            /// padding zu benutzen führt zu einem bug bei wiederholtem ein/ausklappen des Menüs
+            // padding: const EdgeInsets.fromLTRB(8.0, 6.0, 8.0, 0.0),
+            customHeights: _getCustomItemsHeights(),
+          ),
+
+          /// Steuert was oben als zugeklappte Zeile angezeigt wird.
+          /// Möchte eine Liste an Widgets, welche genauso lang ist wie die Liste an items.
+          /// Wenn der User item[2] selected, zeigt es in der Zeile widget[2]
+          /// hat keinen direkten Zusammenhang mit den items
+          selectedItemBuilder: (BuildContext context) {
+            return items.map<Widget>((MenuItem item) {
+              return MenuItem.buildItemTitle(item, context);
+            }).toList();
+          },
+          iconStyleData: const IconStyleData(
+            icon: Icon(Icons.arrow_drop_down, color: Colors.white),
+            openMenuIcon: Icon(Icons.arrow_drop_up, color: Colors.white),
+          ),
+        ),
+      ),
       body: userAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, _) => Center(child: Text(error.toString())),
@@ -169,7 +231,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                                           .displaySmall),
                                                 ),
                                                 const SizedBox(width: 8.0),
-                                                Icon(Icons.pin_drop_outlined,
+                                                Icon(Icons.gas_meter,
                                                     color: Theme.of(context)
                                                         .colorScheme
                                                         .onSecondary,
@@ -178,7 +240,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                                 SizedBox(
                                                   width: 60,
                                                   child: Text(
-                                                      "${fzg.latitude?.toStringAsFixed(2) ?? "-"}, ${fzg.longitude?.toStringAsFixed(2) ?? "-"}",
+                                                      fzg.fuelLevel ==
+                                                                  null ||
+                                                              fzg.fuelLevel
+                                                                      .toString() ==
+                                                                  "null"
+                                                          ? "-"
+                                                          : fzg.fuelLevel!
+                                                                  .toInt()
+                                                                  .toString() +
+                                                              " %",
                                                       style: Theme.of(context)
                                                           .textTheme
                                                           .displaySmall),
@@ -235,7 +306,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                                   height: 37.0,
                                                   child: FilledButton(
                                                     onPressed: () {
-                                                      // Maps oder Navigation öffnen
+                                                      context.push('/map', extra: fzg); // Fahrzeug-Objekt übergeben
                                                     },
                                                     style: ButtonStyle(
                                                       padding:
@@ -377,4 +448,180 @@ class InvertedRoundedRectanglePainterLeft extends CustomPainter {
   @override
   bool shouldRepaint(InvertedRoundedRectanglePainterLeft oldDelegate) =>
       oldDelegate.radius != radius || oldDelegate.color != color;
+}
+
+const List<MenuItem> lichtfarben = [rot, gruen, blau];
+const rot = MenuItem(
+    title: 'Rot', icon: Icons.circle, color: Colors.red, description: '');
+const gruen = MenuItem(
+    title: 'Grün', icon: Icons.circle, color: Colors.green, description: '');
+const blau = MenuItem(
+    title: 'Blau', icon: Icons.circle, color: Colors.blue, description: '');
+
+/// _________________________________________________________________________________________///
+///
+const List<MenuItem> items = [Privatfahrt, Firmenfahrt];
+
+const Privatfahrt = MenuItem(
+    title: 'Privatfahrt',
+    icon: Icons.person,
+    color: Colors.white,
+    description: '');
+const Firmenfahrt = MenuItem(
+    title: 'Firmenfahrt',
+    icon: Icons.business_outlined,
+    color: Colors.white,
+    description: '');
+
+List<double> _getCustomItemsHeights() {
+  // final List<double> itemsHeights = [];
+  // for (int i = 0; i < items.length; i++) {
+  //   // der letzte Eintrag hat keinen divider angefügt bekommen (in der buildItemDescription Methode), daher geringere height
+  //   if (i == items.length - 1) {
+  //     itemsHeights.add(75);
+  //   }
+  //   //falls ein Eintrag von den anderen abweicht, hier mit else if individualisieren
+  //   else if (i == 1){
+  //     itemsHeights.add(95);
+  //   }
+  //   else {
+  //     itemsHeights.add(78);
+  //   }
+  // }
+  // return itemsHeights;
+  return [50, 50];
+}
+
+List<double> _getCustomFarbItemsHeights() {
+  return [40, 40];
+}
+
+class MenuItem {
+  const MenuItem({
+    required this.title,
+    required this.icon,
+    required this.description,
+    required this.color,
+  });
+
+  final String title;
+  final IconData icon;
+  final String description;
+  final Color color;
+
+  @override
+  String toString() {
+    return this.title;
+  }
+
+  static Widget buildItemTitleUniqueColor(MenuItem item, BuildContext context) {
+    return Row(
+      children: [
+        Icon(item.icon, color: item.color, size: 22),
+        const SizedBox(
+          width: 10,
+        ),
+        Expanded(
+          child: Text(
+            item.title,
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+        ),
+      ],
+    );
+  }
+
+  static Widget buildItemDescriptionUniqueColor(
+      MenuItem item, BuildContext context) {
+    return Column(
+      children: [
+        Row(
+          children: [
+            Icon(item.icon, color: item.color, size: 22),
+            const SizedBox(
+              width: 10,
+            ),
+            Expanded(
+              child: Text(
+                item.title,
+                style: Theme.of(context).textTheme.displayLarge,
+              ),
+            ),
+          ],
+        ),
+        // Padding(
+        //   padding: const EdgeInsets.all(5.0),
+        //   child: Row(
+        //     children: [
+        //       Expanded(
+        //           child: Text(
+        //         item.description,
+        //         style: context.textTheme.displaySmall,
+        //       ))
+        //     ],
+        //   ),
+        // ),
+        if (item != lichtfarben.last)
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 8.0),
+            child: Divider(height: 2.0),
+          ),
+      ],
+    );
+  }
+
+  static Widget buildItemTitle(MenuItem item, BuildContext context) {
+    return Row(
+      children: [
+        Icon(item.icon, color: Colors.white, size: 22),
+        const SizedBox(
+          width: 10,
+        ),
+        Expanded(
+          child: Text(
+            item.title,
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+        ),
+      ],
+    );
+  }
+
+  static Widget buildItemDescription(MenuItem item, BuildContext context) {
+    return Column(
+      children: [
+        Row(
+          children: [
+            Icon(item.icon,
+                color: Theme.of(context).colorScheme.onSecondary, size: 22),
+            const SizedBox(
+              width: 10,
+            ),
+            Expanded(
+              child: Text(
+                item.title,
+                style: Theme.of(context).textTheme.displayLarge,
+              ),
+            ),
+          ],
+        ),
+        // Padding(
+        //   padding: const EdgeInsets.all(5.0),
+        //   child: Row(
+        //     children: [
+        //       Expanded(
+        //           child: Text(
+        //             item.description,
+        //             style: Theme
+        //                 .of(context)
+        //                 .textTheme
+        //                 .displaySmall,
+        //           ))
+        //     ],
+        //   ),
+        // ),
+        // if (item != items.last) const Divider(height: 8.0),
+      ],
+    );
+  }
 }
