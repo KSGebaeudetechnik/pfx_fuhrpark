@@ -97,7 +97,7 @@ class _KarteScreenState extends ConsumerState<KarteScreen> {
 
   void _startTimer() {
     _timer =
-        Timer.periodic(const Duration(seconds: 3), (_) => _syncFahrzeuge());
+        Timer.periodic(const Duration(seconds: 200), (_) => _syncFahrzeuge());
   }
 
   Future<void> _syncFahrzeuge() async {

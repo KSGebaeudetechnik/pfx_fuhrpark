@@ -118,14 +118,14 @@ class _ProfilScreenState extends ConsumerState<ProfilScreen> {
                           child: Row(
                             children: [
                               Text(
-                                "${fahrt.startzeit.hour}:${fahrt.startzeit.minute.toString().padLeft(2, '0')} – "
-                                    "${fahrt.stopzeit.hour}:${fahrt.stopzeit.minute.toString().padLeft(2, '0')}",
+                                "${fahrt.startzeit.hour.toString().padLeft(2, '0')}:${fahrt.startzeit.minute.toString().padLeft(2, '0')} – "
+                                    "${fahrt.stopzeit.hour.toString().padLeft(2, '0')}:${fahrt.stopzeit.minute.toString().padLeft(2, '0')}",
                                 style: const TextStyle(color: Colors.black),
                               ),
                               const SizedBox(width: 50),
                               Text(
                                 "${fahrt.stopzeit.difference(fahrt.startzeit).inHours}:"
-                                    "${fahrt.stopzeit.difference(fahrt.startzeit).inMinutes.remainder(60).toString().padLeft(2, '0')}",
+                                    "${fahrt.stopzeit.difference(fahrt.startzeit).inMinutes.remainder(60).toString().padLeft(2, '0')}  Std.",
                                 style: const TextStyle(color: Colors.black),
                               ),
                             ],

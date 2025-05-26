@@ -20,70 +20,151 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   bool _ledLicht = false;
   MenuItem selectedItem = items[0];
   MenuItem selectedFarbItem = lichtfarben[0];
+  bool istPrivatfahrt = false;
 
   @override
   Widget build(BuildContext context) {
     final userAsync = ref.watch(userProvider);
 
     return Scaffold(
+      // appBar: AppBar(
+      //   backgroundColor: Theme.of(context).colorScheme.primary,
+      //   centerTitle: true,
+      //   title: Switch(value: istPrivatfahrt, onChanged: (bool value) {
+      //     // This is called when the user toggles the switch.
+      //     setState(() {
+      //       istPrivatfahrt = value;
+      //     });
+      //   },),
+      // ),
       backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
       resizeToAvoidBottomInset: false,
-      floatingActionButton: DropdownButtonHideUnderline(
-        child: DropdownButton2(
-          isExpanded: true,
-
-          hint: Text(
-            'Select Item',
-            style: TextStyle(
-              fontSize: 14,
-              color: Theme.of(context).hintColor,
-            ),
-          ),
-          items: [
-            ...items.map(
-              (item) => DropdownMenuItem<MenuItem>(
-                value: item,
-                child: MenuItem.buildItemDescription(item, context),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+      floatingActionButton: Transform.translate(
+        offset: Offset(16, 0),
+        child: Padding(
+          padding: const EdgeInsets.all(0.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              Container(
+          decoration: BoxDecoration(
+          color: Colors.transparent, // wichtig, damit Schatten sichtbar bleibt
+            boxShadow: [
+              BoxShadow(
+                color: Colors.blue.shade900.withOpacity(0.3),
+                blurRadius: 20,
+                spreadRadius: 5,
+                offset: const Offset(0, -10), // Schatten NACH OBEN
               ),
-            ),
-          ],
-          onChanged: (changed) {
-            setState(() {
-              selectedItem = changed!;
-            });
-          },
-          value: selectedItem,
-          buttonStyleData: ButtonStyleData(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              height: 50,
-              width: 180,
-              decoration: BoxDecoration(
-                  color: Colors.indigo,
-                  borderRadius: const BorderRadius.all(Radius.circular(30.0)))),
-          dropdownStyleData: const DropdownStyleData(
-            maxHeight: 500,
-          ),
-          menuItemStyleData: MenuItemStyleData(
-            /// padding zu benutzen führt zu einem bug bei wiederholtem ein/ausklappen des Menüs
-            // padding: const EdgeInsets.fromLTRB(8.0, 6.0, 8.0, 0.0),
-            customHeights: _getCustomItemsHeights(),
-          ),
-
-          /// Steuert was oben als zugeklappte Zeile angezeigt wird.
-          /// Möchte eine Liste an Widgets, welche genauso lang ist wie die Liste an items.
-          /// Wenn der User item[2] selected, zeigt es in der Zeile widget[2]
-          /// hat keinen direkten Zusammenhang mit den items
-          selectedItemBuilder: (BuildContext context) {
-            return items.map<Widget>((MenuItem item) {
-              return MenuItem.buildItemTitle(item, context);
-            }).toList();
-          },
-          iconStyleData: const IconStyleData(
-            icon: Icon(Icons.arrow_drop_down, color: Colors.white),
-            openMenuIcon: Icon(Icons.arrow_drop_up, color: Colors.white),
+            ],),
+                child: CustomPaint(
+                  painter: InvertedRoundedRectanglePainterLeft(
+                    color: Colors.white,
+                    radius: 15.0,
+                  ),
+                  child: const SizedBox(height: 15.0, width: 30.0),
+                ),
+              ),
+              Container(
+                  decoration: BoxDecoration(
+                    color: Colors.transparent, // wichtig, damit Schatten sichtbar bleibt
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.blue.shade900.withOpacity(0.3),
+                        blurRadius: 20,
+                        spreadRadius: 5,
+                        offset: const Offset(0, -10), // Schatten NACH OBEN
+                      ),
+                    ],),
+                child: Container(
+                  decoration: ShapeDecoration(
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.only(
+                          topRight: Radius.circular(18.0),
+                          topLeft: Radius.circular(18.0),
+                        ),
+                      ),
+                      color: Colors.white,),
+                  width: 140.0,
+                  height: 80.0,
+                  child: Column(
+                    children: [
+                      Switch(
+                          value: istPrivatfahrt,
+                          onChanged: (bool value) {
+                            setState(() {
+                              istPrivatfahrt = value;
+                            });
+                          }),
+                      Text("Privatfahrt", style: TextStyle(color: Colors.black),)
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
+
+      // DropdownButtonHideUnderline(
+      //   child: DropdownButton2(
+      //     isExpanded: true,
+      //
+      //     hint: Text(
+      //       'Select Item',
+      //       style: TextStyle(
+      //         fontSize: 14,
+      //         color: Theme.of(context).hintColor,
+      //       ),
+      //     ),
+      //     items: [
+      //       ...items.map(
+      //         (item) => DropdownMenuItem<MenuItem>(
+      //           value: item,
+      //           child: MenuItem.buildItemDescription(item, context),
+      //         ),
+      //       ),
+      //     ],
+      //     onChanged: (changed) {
+      //       setState(() {
+      //         selectedItem = changed!;
+      //       });
+      //     },
+      //     value: selectedItem,
+      //     buttonStyleData: ButtonStyleData(
+      //         padding: const EdgeInsets.symmetric(horizontal: 16),
+      //         height: 50,
+      //         width: 180,
+      //         decoration: BoxDecoration(
+      //             color: Colors.indigo,
+      //             borderRadius: const BorderRadius.all(Radius.circular(30.0)))),
+      //     dropdownStyleData: const DropdownStyleData(
+      //       maxHeight: 500,
+      //     ),
+      //     menuItemStyleData: MenuItemStyleData(
+      //       /// padding zu benutzen führt zu einem bug bei wiederholtem ein/ausklappen des Menüs
+      //       // padding: const EdgeInsets.fromLTRB(8.0, 6.0, 8.0, 0.0),
+      //       customHeights: _getCustomItemsHeights(),
+      //     ),
+      //
+      //     /// Steuert was oben als zugeklappte Zeile angezeigt wird.
+      //     /// Möchte eine Liste an Widgets, welche genauso lang ist wie die Liste an items.
+      //     /// Wenn der User item[2] selected, zeigt es in der Zeile widget[2]
+      //     /// hat keinen direkten Zusammenhang mit den items
+      //     selectedItemBuilder: (BuildContext context) {
+      //       return items.map<Widget>((MenuItem item) {
+      //         return MenuItem.buildItemTitle(item, context);
+      //       }).toList();
+      //     },
+      //     iconStyleData: const IconStyleData(
+      //       icon: Icon(Icons.arrow_drop_down, color: Colors.white),
+      //       openMenuIcon: Icon(Icons.arrow_drop_up, color: Colors.white),
+      //     ),
+      //   ),
+      // ),
       body: userAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, _) => Center(child: Text(error.toString())),
@@ -178,6 +259,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                             .textTheme
                                             .headlineMedium,
                                         textAlign: TextAlign.left,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        softWrap: false,
                                       ),
                                     ),
                                   ),
@@ -240,8 +324,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                                 SizedBox(
                                                   width: 60,
                                                   child: Text(
-                                                      fzg.fuelLevel ==
-                                                                  null ||
+                                                      fzg.fuelLevel == null ||
                                                               fzg.fuelLevel
                                                                       .toString() ==
                                                                   "null"
@@ -306,7 +389,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                                   height: 37.0,
                                                   child: FilledButton(
                                                     onPressed: () {
-                                                      context.push('/map', extra: fzg); // Fahrzeug-Objekt übergeben
+                                                      context.push('/map',
+                                                          extra:
+                                                              fzg); // Fahrzeug-Objekt übergeben
                                                     },
                                                     style: ButtonStyle(
                                                       padding:

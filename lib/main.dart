@@ -72,7 +72,7 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
             primaryContainer: const Color(0xFF244F8F), //Card Buttons
             onSecondary: const Color(0xFF2F4162), //Nav Bar Text
             outline: const Color(0xFFAEBACC), //Divider
-            secondaryContainer: const Color(0xFFECF0F8), //Background
+            secondaryContainer: const Color(0xFF2F4162), //Background
             secondary: const Color(0xFFCADCF7), //Nav selected
             tertiary: const Color(0xFF85AAE0), //Diagram color
 
