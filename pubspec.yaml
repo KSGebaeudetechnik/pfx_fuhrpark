@@ -55,6 +55,7 @@ dependencies:
   flutter_localization: ^0.3.2
   dropdown_button2: ^2.3.9
   open_file: ^3.5.10
+  flutter_launcher_icons: ^0.14.4
 
 dev_dependencies:
   build_runner: ^2.4.13

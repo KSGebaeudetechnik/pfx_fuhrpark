@@ -1,0 +1,2 @@
+/Users/kevinkoehler/Powerfox/AndroidStudioProjects/pfx_fuhrpark/android/app/.cxx/RelWithDebInfo/5ff3a1vu/x86_64/CMakeFiles/edit_cache.dir
+/Users/kevinkoehler/Powerfox/AndroidStudioProjects/pfx_fuhrpark/android/app/.cxx/RelWithDebInfo/5ff3a1vu/x86_64/CMakeFiles/rebuild_cache.dir
