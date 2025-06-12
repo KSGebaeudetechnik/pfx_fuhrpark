@@ -5,8 +5,10 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import '../../authentication/data/auth_repository.dart';
 import '../data/fahrzeug_provider.dart';
+import '../objects/fahrzeug.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -21,6 +23,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   MenuItem selectedItem = items[0];
   MenuItem selectedFarbItem = lichtfarben[0];
   bool istPrivatfahrt = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final user = await ref.read(userProvider.future);
+      setState(() {
+        istPrivatfahrt = user.privatfahrt;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,6 +52,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       //   },),
       // ),
       backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
+      // backgroundColor: Colors.grey,
       resizeToAvoidBottomInset: false,
       floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
       floatingActionButton: Transform.translate(
@@ -50,16 +65,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             mainAxisSize: MainAxisSize.max,
             children: [
               Container(
-          decoration: BoxDecoration(
-          color: Colors.transparent, // wichtig, damit Schatten sichtbar bleibt
-            boxShadow: [
-              BoxShadow(
-                color: Colors.blue.shade900.withOpacity(0.3),
-                blurRadius: 20,
-                spreadRadius: 5,
-                offset: const Offset(0, -10), // Schatten NACH OBEN
-              ),
-            ],),
+                decoration: BoxDecoration(
+                  color: Colors
+                      .transparent, // wichtig, damit Schatten sichtbar bleibt
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.blue.shade900.withOpacity(0.3),
+                      blurRadius: 20,
+                      spreadRadius: 5,
+                      offset: const Offset(0, -10), // Schatten NACH OBEN
+                    ),
+                  ],
+                ),
                 child: CustomPaint(
                   painter: InvertedRoundedRectanglePainterLeft(
                     color: Colors.white,
@@ -69,37 +86,54 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
               ),
               Container(
-                  decoration: BoxDecoration(
-                    color: Colors.transparent, // wichtig, damit Schatten sichtbar bleibt
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.blue.shade900.withOpacity(0.3),
-                        blurRadius: 20,
-                        spreadRadius: 5,
-                        offset: const Offset(0, -10), // Schatten NACH OBEN
-                      ),
-                    ],),
+                decoration: BoxDecoration(
+                  color: Colors
+                      .transparent, // wichtig, damit Schatten sichtbar bleibt
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.blue.shade900.withOpacity(0.3),
+                      blurRadius: 20,
+                      spreadRadius: 5,
+                      offset: const Offset(0, -10), // Schatten NACH OBEN
+                    ),
+                  ],
+                ),
                 child: Container(
                   decoration: ShapeDecoration(
-                      shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.only(
-                          topRight: Radius.circular(18.0),
-                          topLeft: Radius.circular(18.0),
-                        ),
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.only(
+                        topRight: Radius.circular(18.0),
+                        topLeft: Radius.circular(18.0),
                       ),
-                      color: Colors.white,),
+                    ),
+                    color: Colors.white,
+                  ),
                   width: 140.0,
                   height: 80.0,
                   child: Column(
                     children: [
                       Switch(
                           value: istPrivatfahrt,
-                          onChanged: (bool value) {
-                            setState(() {
-                              istPrivatfahrt = value;
-                            });
+                          onChanged: (bool value) async{
+                              setState(() => istPrivatfahrt = value);
+
+                              final user = await ref.read(userProvider.future);
+                              final repo = ref.read(privatfahrtRepositoryProvider);
+                              final success = await repo.updatePrivatfahrt(personalnummer: user.personalnummer, status: value);
+
+                              if (!success) {
+                                setState(() => istPrivatfahrt = !value); // Rückgängig
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('Privatfahrt konnte nicht aktualisiert werden')),
+                                  );
+                                }
+                              }
                           }),
-                      Text("Privatfahrt", style: TextStyle(color: Colors.black),)
+                      Text(
+                        "Privatfahrt",
+                        style: TextStyle(color: Colors.black),
+                      )
                     ],
                   ),
                 ),
@@ -108,63 +142,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ),
       ),
-
-      // DropdownButtonHideUnderline(
-      //   child: DropdownButton2(
-      //     isExpanded: true,
-      //
-      //     hint: Text(
-      //       'Select Item',
-      //       style: TextStyle(
-      //         fontSize: 14,
-      //         color: Theme.of(context).hintColor,
-      //       ),
-      //     ),
-      //     items: [
-      //       ...items.map(
-      //         (item) => DropdownMenuItem<MenuItem>(
-      //           value: item,
-      //           child: MenuItem.buildItemDescription(item, context),
-      //         ),
-      //       ),
-      //     ],
-      //     onChanged: (changed) {
-      //       setState(() {
-      //         selectedItem = changed!;
-      //       });
-      //     },
-      //     value: selectedItem,
-      //     buttonStyleData: ButtonStyleData(
-      //         padding: const EdgeInsets.symmetric(horizontal: 16),
-      //         height: 50,
-      //         width: 180,
-      //         decoration: BoxDecoration(
-      //             color: Colors.indigo,
-      //             borderRadius: const BorderRadius.all(Radius.circular(30.0)))),
-      //     dropdownStyleData: const DropdownStyleData(
-      //       maxHeight: 500,
-      //     ),
-      //     menuItemStyleData: MenuItemStyleData(
-      //       /// padding zu benutzen führt zu einem bug bei wiederholtem ein/ausklappen des Menüs
-      //       // padding: const EdgeInsets.fromLTRB(8.0, 6.0, 8.0, 0.0),
-      //       customHeights: _getCustomItemsHeights(),
-      //     ),
-      //
-      //     /// Steuert was oben als zugeklappte Zeile angezeigt wird.
-      //     /// Möchte eine Liste an Widgets, welche genauso lang ist wie die Liste an items.
-      //     /// Wenn der User item[2] selected, zeigt es in der Zeile widget[2]
-      //     /// hat keinen direkten Zusammenhang mit den items
-      //     selectedItemBuilder: (BuildContext context) {
-      //       return items.map<Widget>((MenuItem item) {
-      //         return MenuItem.buildItemTitle(item, context);
-      //       }).toList();
-      //     },
-      //     iconStyleData: const IconStyleData(
-      //       icon: Icon(Icons.arrow_drop_down, color: Colors.white),
-      //       openMenuIcon: Icon(Icons.arrow_drop_up, color: Colors.white),
-      //     ),
-      //   ),
-      // ),
       body: userAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, _) => Center(child: Text(error.toString())),
@@ -176,286 +153,442 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (error, _) => Center(child: Text(error.toString())),
             data: (fahrzeuge) {
-              return ListView.builder(
-                itemCount: fahrzeuge.length + 1,
-                itemBuilder: (context, index) {
-                  if (index == fahrzeuge.length)
-                    return const SizedBox(height: 50);
-                  final fzg = fahrzeuge[index];
-
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Stack(
-                        alignment: AlignmentDirectional.topEnd,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(top: 35.0),
-                            child: GestureDetector(
-                                onTap: () {
-                                  context
-                                      .push('/home/editFahrzeug', extra: fzg)
-                                      .then((value) => setState(() {}));
-                                },
-                                child: fzg.typNummer == "2" ||
-                                        fzg.typNummer == "1" ||
-                                        fzg.typNummer == "4" ||
-                                        fzg.typNummer == null
-                                    ? ClipRRect(
-                                        borderRadius:
-                                            const BorderRadius.vertical(
-                                                top: Radius.circular(18.0)),
-                                        child: Image.asset(
-                                          'assets/images/pkw.png',
-                                          width: 314,
-                                          height: 200,
-                                          fit: BoxFit.cover,
-                                        ),
-                                      )
-                                    : fzg.typNummer == "3"
-                                        ? ClipRRect(
-                                            borderRadius:
-                                                const BorderRadius.vertical(
-                                                    top: Radius.circular(18.0)),
-                                            child: Image.asset(
-                                              'assets/images/lkw.png',
-                                              width: 314,
-                                              height: 200,
-                                              fit: BoxFit.cover,
-                                            ),
-                                          )
-                                        : ClipRRect(
-                                            borderRadius:
-                                                const BorderRadius.vertical(
-                                                    top: Radius.circular(18.0)),
-                                            child: Image.asset(
-                                              'assets/images/anhaenger.png',
-                                              width: 314,
-                                              height: 200,
-                                              fit: BoxFit.cover,
-                                            ),
-                                          )),
-                          ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const SizedBox(height: 160),
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Card(
-                                    shape: const RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.vertical(
-                                          top: Radius.circular(18.0)),
-                                    ),
-                                    margin: EdgeInsets.zero,
-                                    elevation: 0.0,
-                                    child: Padding(
-                                      padding: const EdgeInsets.fromLTRB(
-                                          16.0, 8.0, 15.0, 6.0),
-                                      child: Text(
-                                        fzg.name ?? "Unbekanntes Fahrzeug",
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .headlineMedium,
-                                        textAlign: TextAlign.left,
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        softWrap: false,
-                                      ),
-                                    ),
-                                  ),
-                                  CustomPaint(
-                                    painter: InvertedRoundedRectanglePainter(
-                                      color: Colors.white,
-                                      radius: 15.0,
-                                    ),
-                                    child: const SizedBox(
-                                        height: 15.0, width: 50.0),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Card(
-                                    shape: const RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.only(
-                                        topRight: Radius.circular(18.0),
-                                        bottomLeft: Radius.circular(18.0),
-                                        bottomRight: Radius.circular(18.0),
-                                      ),
-                                    ),
-                                    margin: EdgeInsets.zero,
-                                    elevation: 0.0,
-                                    child: SizedBox(
-                                      height: 112.0,
-                                      width: 314,
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 18.0, vertical: 8.0),
-                                        child: Column(
-                                          children: [
-                                            const SizedBox(height: 3.0),
-                                            Row(
-                                              children: [
-                                                Icon(Icons.schedule,
-                                                    color: Theme.of(context)
-                                                        .colorScheme
-                                                        .onSecondary,
-                                                    size: 23.0),
-                                                const SizedBox(width: 4.0),
-                                                SizedBox(
-                                                  width: 80,
-                                                  child: Text(
-                                                      fzg.gpsTimeString ??
-                                                          "Zeit unbekannt",
-                                                      style: Theme.of(context)
-                                                          .textTheme
-                                                          .displaySmall),
-                                                ),
-                                                const SizedBox(width: 8.0),
-                                                Icon(Icons.gas_meter,
-                                                    color: Theme.of(context)
-                                                        .colorScheme
-                                                        .onSecondary,
-                                                    size: 23.0),
-                                                const SizedBox(width: 4.0),
-                                                SizedBox(
-                                                  width: 60,
-                                                  child: Text(
-                                                      fzg.fuelLevel == null ||
-                                                              fzg.fuelLevel
-                                                                      .toString() ==
-                                                                  "null"
-                                                          ? "-"
-                                                          : fzg.fuelLevel!
-                                                                  .toInt()
-                                                                  .toString() +
-                                                              " %",
-                                                      style: Theme.of(context)
-                                                          .textTheme
-                                                          .displaySmall),
-                                                ),
-                                                const SizedBox(width: 9.0),
-                                                RotatedBox(
-                                                  quarterTurns: 1,
-                                                  child: Icon(
-                                                    Icons.battery_full,
-                                                    color: Theme.of(context)
-                                                        .colorScheme
-                                                        .onSecondary,
-                                                    size: 23.0,
-                                                  ),
-                                                ),
-                                                const SizedBox(width: 4.0),
-                                                SizedBox(
-                                                  width: 40,
-                                                  child: Text(
-                                                    "${fzg.externalPower?.toStringAsFixed(1) ?? '-'} V",
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .displaySmall,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                            const SizedBox(height: 2.0),
-                                            Divider(
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .outline),
-                                            const SizedBox(height: 6.0),
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                SizedBox(
-                                                  height: 37.0,
-                                                  child: OutlinedButton(
-                                                    onPressed: () {
-                                                      context.push(
-                                                          '/home/editFahrzeug',
-                                                          extra: fzg);
-                                                    },
-                                                    child: Text("Details",
-                                                        style: Theme.of(context)
-                                                            .textTheme
-                                                            .labelLarge),
-                                                  ),
-                                                ),
-                                                const SizedBox(width: 7.0),
-                                                SizedBox(
-                                                  height: 37.0,
-                                                  child: FilledButton(
-                                                    onPressed: () {
-                                                      context.push('/map',
-                                                          extra:
-                                                              fzg); // Fahrzeug-Objekt übergeben
-                                                    },
-                                                    style: ButtonStyle(
-                                                      padding:
-                                                          MaterialStateProperty
-                                                              .all(const EdgeInsets
-                                                                  .symmetric(
-                                                                  horizontal:
-                                                                      14.0)),
-                                                    ),
-                                                    child: Text("   Karte   ",
-                                                        style: Theme.of(context)
-                                                            .textTheme
-                                                            .labelSmall),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 5.0),
-                            ],
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 35.0),
-                            child: Card(
-                              shape: const RoundedRectangleBorder(
-                                borderRadius: BorderRadius.only(
-                                  topRight: Radius.circular(18.0),
-                                  bottomLeft: Radius.circular(18.0),
-                                ),
-                              ),
-                              margin: EdgeInsets.zero,
-                              elevation: 0.0,
-                              child: SizedBox(
-                                height: 36.0,
-                                width: 36.0,
-                                child: Icon(
-                                  fzg.ignition == true
-                                      ? Icons.flash_on
-                                      : Icons.flash_off,
-                                  color:
-                                      Theme.of(context).colorScheme.onSecondary,
-                                  size: 24.0,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  );
-                },
-              );
+              if (fahrzeuge.length == 1) {
+                final fzg = fahrzeuge.first;
+                return Center(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            // Dein kompletter Card-Stack hier wie im ListView.builder (kopiert oder ausgelagert)
+                            buildFahrzeugCard(context, fzg),
+                          ],
+                        ),
+                        const SizedBox(height: 50),
+                      ],
+                    ),
+                  ),
+                );
+              } else {
+                return ListView.builder(
+                  itemCount: fahrzeuge.length + 1,
+                  itemBuilder: (context, index) {
+                    if (index == fahrzeuge.length) return const SizedBox(height: 50);
+                    final fzg = fahrzeuge[index];
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        buildFahrzeugCard(context, fzg),
+                      ],
+                    );
+                  },
+                );
+              }
             },
           );
         },
       ),
     );
   }
+
+  /// __________HILFSMETHODEN_____________________________________________________________
+
+
+  Widget buildFahrzeugCard(BuildContext context, Fahrzeug fzg) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Stack(
+          alignment: AlignmentDirectional.topEnd,
+          children: [
+            (fzg.ignition == true &&
+                fzg.gpsTimeString != null &&
+                fzg.gpsTimeString!.isNotEmpty &&
+                !isOlderThan2Days(fzg.gpsTimeString!))
+                ? Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SizedBox(
+                  height: 40.0,
+                ),
+                Row(
+                  children: [
+                    Container(
+                      height: 270.0,
+                      width: 300.0,
+                      decoration: BoxDecoration(
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.white,
+                            blurRadius: 30,
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      width: 7.0,
+                    )
+                  ],
+                ),
+              ],
+            )
+                : SizedBox(
+              height: 0,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 35.0),
+              child: GestureDetector(
+                  onTap: () {
+                    context
+                        .push('/home/editFahrzeug', extra: fzg)
+                        .then((value) => setState(() {}));
+                  },
+                  child: fzg.typNummer == "2" ||
+                      fzg.typNummer == "1" ||
+                      fzg.typNummer == "4" ||
+                      fzg.typNummer == null
+                      ? ClipRRect(
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(18.0),
+                    ),
+                    child: isOlderThan2Days(fzg.gpsTimeString!)
+                        ? ColorFiltered(
+                      colorFilter: const ColorFilter.matrix(<double>[
+                        0.2126, 0.7152, 0.0722, 0, 0,
+                        0.2126, 0.7152, 0.0722, 0, 0,
+                        0.2126, 0.7152, 0.0722, 0, 0,
+                        0,      0,      0,      1, 0,
+                      ]),
+                      child: Image.asset(
+                        'assets/images/pkw.png',
+                        width: 314,
+                        height: 200,
+                        fit: BoxFit.cover,
+                      ),
+                    )
+                        : Image.asset(
+                      'assets/images/pkw.png',
+                      width: 314,
+                      height: 200,
+                      fit: BoxFit.cover,
+                    ),
+                  )
+                      : fzg.typNummer == "3"
+                      ? ClipRRect(
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(18.0),
+                    ),
+                    child: isOlderThan2Days(fzg.gpsTimeString!)
+                        ? ColorFiltered(
+                      colorFilter: const ColorFilter.matrix(<double>[
+                        0.2126, 0.7152, 0.0722, 0, 0,
+                        0.2126, 0.7152, 0.0722, 0, 0,
+                        0.2126, 0.7152, 0.0722, 0, 0,
+                        0,      0,      0,      1, 0,
+                      ]),
+                      child: Image.asset(
+                        'assets/images/lkw.png',
+                        width: 314,
+                        height: 200,
+                        fit: BoxFit.cover,
+                      ),
+                    )
+                        : Image.asset(
+                      'assets/images/lkw.png',
+                      width: 314,
+                      height: 200,
+                      fit: BoxFit.cover,
+                    ),
+                  )
+                      : ClipRRect(
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(18.0),
+                    ),
+                    child: isOlderThan2Days(fzg.gpsTimeString!)
+                        ? ColorFiltered(
+                      colorFilter: const ColorFilter.matrix(<double>[
+                        0.2126, 0.7152, 0.0722, 0, 0,
+                        0.2126, 0.7152, 0.0722, 0, 0,
+                        0.2126, 0.7152, 0.0722, 0, 0,
+                        0,      0,      0,      1, 0,
+                      ]),
+                      child: Image.asset(
+                        'assets/images/anhaenger.png',
+                        width: 314,
+                        height: 200,
+                        fit: BoxFit.cover,
+                      ),
+                    )
+                        : Image.asset(
+                      'assets/images/anhaenger.png',
+                      width: 314,
+                      height: 200,
+                      fit: BoxFit.cover,
+                    ),
+                  )),
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 160),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Card(
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.vertical(
+                            top: Radius.circular(18.0)),
+                      ),
+                      margin: EdgeInsets.zero,
+                      elevation: 0.0,
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(
+                            16.0, 8.0, 15.0, 6.0),
+                        child: Text(
+                          fzg.name ?? "Unbekanntes Fahrzeug",
+                          style: Theme.of(context)
+                              .textTheme
+                              .headlineMedium,
+                          textAlign: TextAlign.left,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          softWrap: false,
+                        ),
+                      ),
+                    ),
+                    CustomPaint(
+                      painter: InvertedRoundedRectanglePainter(
+                        color: Colors.white,
+                        radius: 15.0,
+                      ),
+                      child: const SizedBox(
+                          height: 15.0, width: 50.0),
+                    ),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Card(
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.only(
+                          topRight: Radius.circular(18.0),
+                          bottomLeft: Radius.circular(18.0),
+                          bottomRight: Radius.circular(18.0),
+                        ),
+                      ),
+                      margin: EdgeInsets.zero,
+                      elevation: 0.0,
+                      child: SizedBox(
+                        height: 112.0,
+                        width: 314,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 18.0, vertical: 8.0),
+                          child: Column(
+                            children: [
+                              const SizedBox(height: 3.0),
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.schedule,
+                                    color: (fzg.gpsTimeString != null && isOlderThan2Days(fzg.gpsTimeString!))
+                                        ? Colors.red
+                                        : Theme.of(context).colorScheme.onSecondary,
+                                    size: 23.0,
+                                  ),
+                                  const SizedBox(width: 4.0),
+                                  SizedBox(
+                                    width: 80,
+                                    child: Text(
+                                      fzg.gpsTimeString ?? "Zeit unbekannt",
+                                      style: (fzg.gpsTimeString != null && isOlderThan2Days(fzg.gpsTimeString!))
+                                          ? Theme.of(context)
+                                          .textTheme
+                                          .displaySmall
+                                          ?.copyWith(color: Colors.red)
+                                          : Theme.of(context).textTheme.displaySmall,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8.0),
+                                  Icon(Icons.local_gas_station,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSecondary,
+                                      size: 23.0),
+                                  const SizedBox(width: 4.0),
+                                  SizedBox(
+                                    width: 60,
+                                    child: Text(
+                                        fzg.fuelLevel == null ||
+                                            fzg.fuelLevel
+                                                .toString() ==
+                                                "null"
+                                            ? "-"
+                                            : fzg.fuelLevel!
+                                            .toInt()
+                                            .toString() +
+                                            " %",
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .displaySmall),
+                                  ),
+                                  const SizedBox(width: 9.0),
+                                  RotatedBox(
+                                    quarterTurns: 1,
+                                    child: Icon(
+                                      Icons.battery_full,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSecondary,
+                                      size: 23.0,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 4.0),
+                                  SizedBox(
+                                    width: 40,
+                                    child: Text(
+                                      "${fzg.externalPower?.toStringAsFixed(1) ?? '-'} V",
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .displaySmall,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 2.0),
+                              Divider(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .outline),
+                              const SizedBox(height: 6.0),
+                              Row(
+                                mainAxisAlignment:
+                                MainAxisAlignment.center,
+                                children: [
+                                  SizedBox(
+                                    height: 37.0,
+                                    child: OutlinedButton(
+                                      onPressed: () {
+                                        context.push(
+                                            '/home/editFahrzeug',
+                                            extra: fzg);
+                                      },
+                                      child: Text("Details",
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .labelLarge),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 7.0),
+                                  SizedBox(
+                                    height: 37.0,
+                                    child: FilledButton(
+                                      onPressed: () {
+                                        context.push('/map',
+                                            extra:
+                                            fzg); // Fahrzeug-Objekt übergeben
+                                      },
+                                      style: ButtonStyle(
+                                        padding:
+                                        MaterialStateProperty
+                                            .all(const EdgeInsets
+                                            .symmetric(
+                                            horizontal:
+                                            14.0)),
+                                      ),
+                                      child: Text("   Karte   ",
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .labelSmall),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 5.0),
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 35.0),
+              child: Card(
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(18.0),
+                    bottomLeft: Radius.circular(18.0),
+                  ),
+                ),
+                margin: EdgeInsets.zero,
+                elevation: 0.0,
+                child:
+                fzg.faultCodes == 0 || fzg.faultCodes == null
+                    ? SizedBox(
+                  height: 0.0,
+                )
+                    : Container(
+                  height: 36.0,
+                  width: 36.0,
+                  // color: Colors.red,
+                  child: Center(
+                      child: Text(
+                        '${fzg.faultCodes}',
+                        style: TextStyle(
+                            color: Colors.red,
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.bold),
+                      )),
+                ),
+              ),
+            ),
+            if (fzg.ignition == true &&
+                (fzg.gpsTimeString?.isNotEmpty ?? false) &&
+                !isOlderThan2Days(fzg.gpsTimeString!))
+              Padding(
+                padding: const EdgeInsets.only(right: 200.0, top: 45.0),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withAlpha(50),
+                    borderRadius: BorderRadius.circular(6),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withAlpha(76),
+                        blurRadius: 8,
+                      ),
+                    ],
+                  ),
+                  child: const Text(
+                    "in Bewegung",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              )
+          ],
+        ),
+      ],
+    );
+  }
+
+
+  bool isOlderThan2Days(String timeString) {
+    final format = DateFormat('dd.MM.yy HH:mm:ss');
+    try {
+      final dateTime = format.parse(timeString);
+      return DateTime.now().difference(dateTime).inDays > 2;
+    } catch (e) {
+      return false;
+    }
+  }
+
 }
 
 class InvertedRoundedRectanglePainter extends CustomPainter {
@@ -710,3 +843,4 @@ class MenuItem {
     );
   }
 }
+

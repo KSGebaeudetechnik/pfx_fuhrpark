@@ -5,7 +5,7 @@
   "entities": [
     {
       "id": "1:2492132413375194045",
-      "lastPropertyId": "5:1481039183044372288",
+      "lastPropertyId": "7:4483891829475136347",
       "name": "User",
       "properties": [
         {
@@ -33,13 +33,23 @@
           "id": "5:1481039183044372288",
           "name": "adminRecht",
           "type": 6
+        },
+        {
+          "id": "6:8857006839854587035",
+          "name": "privatfahrt",
+          "type": 1
+        },
+        {
+          "id": "7:4483891829475136347",
+          "name": "prozentregelung",
+          "type": 1
         }
       ],
       "relations": []
     },
     {
       "id": "2:4725321174313482246",
-      "lastPropertyId": "36:4057863464081282204",
+      "lastPropertyId": "38:5130365957985708650",
       "name": "Fahrzeug",
       "properties": [
         {
@@ -202,6 +212,16 @@
           "id": "36:4057863464081282204",
           "name": "ignition",
           "type": 1
+        },
+        {
+          "id": "37:6761788728027558628",
+          "name": "typ",
+          "type": 9
+        },
+        {
+          "id": "38:5130365957985708650",
+          "name": "typNummer",
+          "type": 9
         }
       ],
       "relations": []

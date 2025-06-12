@@ -26,7 +26,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(1, 2492132413375194045),
     name: 'User',
-    lastPropertyId: const obx_int.IdUid(5, 1481039183044372288),
+    lastPropertyId: const obx_int.IdUid(7, 4483891829475136347),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -59,6 +59,18 @@ final _entities = <obx_int.ModelEntity>[
         type: 6,
         flags: 0,
       ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(6, 8857006839854587035),
+        name: 'privatfahrt',
+        type: 1,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(7, 4483891829475136347),
+        name: 'prozentregelung',
+        type: 1,
+        flags: 0,
+      ),
     ],
     relations: <obx_int.ModelRelation>[],
     backlinks: <obx_int.ModelBacklink>[],
@@ -66,7 +78,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
     id: const obx_int.IdUid(2, 4725321174313482246),
     name: 'Fahrzeug',
-    lastPropertyId: const obx_int.IdUid(36, 4057863464081282204),
+    lastPropertyId: const obx_int.IdUid(38, 5130365957985708650),
     flags: 0,
     properties: <obx_int.ModelProperty>[
       obx_int.ModelProperty(
@@ -261,6 +273,18 @@ final _entities = <obx_int.ModelEntity>[
         type: 1,
         flags: 0,
       ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(37, 6761788728027558628),
+        name: 'typ',
+        type: 9,
+        flags: 0,
+      ),
+      obx_int.ModelProperty(
+        id: const obx_int.IdUid(38, 5130365957985708650),
+        name: 'typNummer',
+        type: 9,
+        flags: 0,
+      ),
     ],
     relations: <obx_int.ModelRelation>[],
     backlinks: <obx_int.ModelBacklink>[],
@@ -431,12 +455,14 @@ obx_int.ModelDefinition getObjectBoxModel() {
       objectToFB: (User object, fb.Builder fbb) {
         final mailOffset = fbb.writeString(object.mail);
         final nameOffset = fbb.writeString(object.name);
-        fbb.startTable(6);
+        fbb.startTable(8);
         fbb.addInt64(0, object.id);
         fbb.addOffset(1, mailOffset);
         fbb.addOffset(2, nameOffset);
         fbb.addInt64(3, object.personalnummer);
         fbb.addInt64(4, object.adminRecht);
+        fbb.addBool(5, object.privatfahrt);
+        fbb.addBool(6, object.prozentregelung);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -467,12 +493,26 @@ obx_int.ModelDefinition getObjectBoxModel() {
           12,
           0,
         );
+        final privatfahrtParam = const fb.BoolReader().vTableGet(
+          buffer,
+          rootOffset,
+          14,
+          false,
+        );
+        final prozentregelungParam = const fb.BoolReader().vTableGet(
+          buffer,
+          rootOffset,
+          16,
+          false,
+        );
         final object = User(
           id: idParam,
           personalnummer: personalnummerParam,
           mail: mailParam,
           name: nameParam,
           adminRecht: adminRechtParam,
+          privatfahrt: privatfahrtParam,
+          prozentregelung: prozentregelungParam,
         );
 
         return object;
@@ -519,7 +559,13 @@ obx_int.ModelDefinition getObjectBoxModel() {
             object.versicherung == null
                 ? null
                 : fbb.writeString(object.versicherung!);
-        fbb.startTable(37);
+        final typOffset =
+            object.typ == null ? null : fbb.writeString(object.typ!);
+        final typNummerOffset =
+            object.typNummer == null
+                ? null
+                : fbb.writeString(object.typNummer!);
+        fbb.startTable(39);
         fbb.addInt64(0, object.id);
         fbb.addOffset(4, nameOffset);
         fbb.addOffset(6, imagePathOffset);
@@ -552,6 +598,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
         fbb.addFloat64(33, object.xAcceleration);
         fbb.addFloat64(34, object.zAcceleration);
         fbb.addBool(35, object.ignition);
+        fbb.addOffset(36, typOffset);
+        fbb.addOffset(37, typNummerOffset);
         fbb.finish(fbb.endTable());
         return object.id;
       },
@@ -582,6 +630,12 @@ obx_int.ModelDefinition getObjectBoxModel() {
         final versicherungParam = const fb.StringReader(
           asciiOptimization: true,
         ).vTableGetNullable(buffer, rootOffset, 30);
+        final typParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 76);
+        final typNummerParam = const fb.StringReader(
+          asciiOptimization: true,
+        ).vTableGetNullable(buffer, rootOffset, 78);
         final gpsTimeParam = const fb.Int64Reader().vTableGetNullable(
           buffer,
           rootOffset,
@@ -699,6 +753,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
                 telefonUnfall: telefonUnfallParam,
                 telefonPanne: telefonPanneParam,
                 versicherung: versicherungParam,
+                typ: typParam,
+                typNummer: typNummerParam,
                 gpsTime: gpsTimeParam,
                 latitude: latitudeParam,
                 longitude: longitudeParam,
@@ -883,6 +939,16 @@ class User_ {
   static final adminRecht = obx.QueryIntegerProperty<User>(
     _entities[0].properties[4],
   );
+
+  /// See [User.privatfahrt].
+  static final privatfahrt = obx.QueryBooleanProperty<User>(
+    _entities[0].properties[5],
+  );
+
+  /// See [User.prozentregelung].
+  static final prozentregelung = obx.QueryBooleanProperty<User>(
+    _entities[0].properties[6],
+  );
 }
 
 /// [Fahrzeug] entity fields to define ObjectBox queries.
@@ -1045,6 +1111,16 @@ class Fahrzeug_ {
   /// See [Fahrzeug.ignition].
   static final ignition = obx.QueryBooleanProperty<Fahrzeug>(
     _entities[1].properties[31],
+  );
+
+  /// See [Fahrzeug.typ].
+  static final typ = obx.QueryStringProperty<Fahrzeug>(
+    _entities[1].properties[32],
+  );
+
+  /// See [Fahrzeug.typNummer].
+  static final typNummer = obx.QueryStringProperty<Fahrzeug>(
+    _entities[1].properties[33],
   );
 }
 

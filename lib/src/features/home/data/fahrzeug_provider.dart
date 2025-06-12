@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../main.dart';
+import '../../authentication/data/privatfahrt_repository.dart';
 import '../objects/fahrzeug.dart';
 import 'fahrzeug_repository.dart';
 import '../../../utils/objectbox.dart'; // Enthält die globale `objectBox`-Instanz
@@ -19,4 +20,9 @@ final fahrzeugeProvider = FutureProvider.family<List<Fahrzeug>, String>((ref, us
 final lokaleFahrzeugeProvider = Provider<List<Fahrzeug>>((ref) {
   final repository = ref.watch(fahrzeugRepositoryProvider);
   return repository.getLocalFahrzeuge();
+});
+
+
+final privatfahrtRepositoryProvider = Provider<PrivatfahrtRepository>((ref) {
+  return PrivatfahrtRepository();
 });

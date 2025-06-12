@@ -87,10 +87,10 @@ class _ProfilScreenState extends ConsumerState<ProfilScreen> {
 
           return fahrtenAsync.when(
             loading: () => const Center(child: CircularProgressIndicator()),
-            error: (e, _) => Center(child: Text("Fehler beim Laden: $e", style: TextStyle(color: Colors.black))),
+            error: (e, _) => Center(child: Text("Fehler beim Laden: $e", style: TextStyle(color: Colors.white))),
             data: (fahrten) {
               if (fahrten.isEmpty) {
-                return const Center(child: Text("Keine Fahrten für diesen Tag", style: TextStyle(color: Colors.black)));
+                return const Center(child: Text("Keine Fahrten für diesen Tag", style: TextStyle(color: Colors.white)));
               }
 
               return ListView.builder(

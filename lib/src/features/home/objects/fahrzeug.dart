@@ -26,6 +26,8 @@ class Fahrzeug {
   final int? overspeed;
   final int? fahrzeugId;
   final int? faultCodes;
+  @Transient()
+  final List<String>? faultCode;
 
 
   final double? latitude;
@@ -84,6 +86,7 @@ class Fahrzeug {
     this.fahrzeugId,
     this.ignition,
     this.faultCodes,
+    this.faultCode,
     this.schein,
   });
 
@@ -130,6 +133,18 @@ class Fahrzeug {
       fahrzeugId: parse<int>(json['ID']),
       ignition: parse<bool>(json['IGNITION']),
       faultCodes: parse<int>(json['FAULT_CODES']),
+      faultCode: (() {
+        final raw = json['FAULT_CODE'];
+        if (raw == null || raw == "null") return null;
+
+        if (raw is List) {
+          return raw.map((e) => e.toString()).toList();
+        } else if (raw is String) {
+          return raw == "null" ? null : [raw];
+        } else {
+          return null;
+        }
+      })(),
       schein: json['SCHEIN'], // bleibt dynamisch
     );
   }
